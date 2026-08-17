@@ -14,6 +14,8 @@ dependencies = [
     "pydantic-settings>=2.12.0",
     "sqlalchemy>=2.0.44",
     "uvicorn>=0.52.3",
+    "langchain",
+    "langchain-ollama",
 ]
 
 [dependency-groups]

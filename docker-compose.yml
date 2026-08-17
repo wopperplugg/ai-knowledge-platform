@@ -7,6 +7,10 @@ services:
       APP_NAME: "KnowledgeOps AI"
       APP_ENV: local
       DATABASE_URL: postgresql+asyncpg://knowledge_ops:knowledge_ops@db:5432/knowledge_ops
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: qwen3:4b
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${API_PORT:-8000}:8000"
     depends_on:

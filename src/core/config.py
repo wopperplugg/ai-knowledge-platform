@@ -14,6 +14,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_model: str = "qwen3:8b"
 
 
 @lru_cache(maxsize=1)
