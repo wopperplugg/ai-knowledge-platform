@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from fastapi.routing import APIRoute
 from pydantic import ValidationError
 
+from src.chat.graph.builder import build_chat_graph
 from src.chat.llm import LLMClient
 from src.chat.router import create_chat_router
 from src.chat.schemas import ChatRequest, ChatResponse
@@ -30,7 +31,8 @@ def get_chat_endpoint() -> Callable[[ChatRequest, ChatService], Awaitable[ChatRe
 
 async def test_chat_returns_answer() -> None:
     endpoint = get_chat_endpoint()
-    service = ChatService(llm=cast(LLMClient, SuccessfulLLMClient()))
+    graph = build_chat_graph(cast(LLMClient, SuccessfulLLMClient()))
+    service = ChatService(graph=graph)
 
     response = await endpoint(ChatRequest(message="hello"), service)
 
@@ -44,7 +46,8 @@ def test_chat_request_rejects_blank_message() -> None:
 
 async def test_chat_raises_502_when_llm_fails() -> None:
     endpoint = get_chat_endpoint()
-    service = ChatService(llm=cast(LLMClient, FailingLLMClient()))
+    graph = build_chat_graph(cast(LLMClient, FailingLLMClient()))
+    service = ChatService(graph=graph)
 
     with pytest.raises(HTTPException) as exc_info:
         await endpoint(ChatRequest(message="hello"), service)

@@ -1,9 +1,16 @@
-from src.chat.llm import LLMClient
+from src.chat.graph.state import ChatGraph, ChatState
 
 
 class ChatService:
-    def __init__(self, llm: LLMClient) -> None:
-        self._llm = llm
+    def __init__(self, graph: ChatGraph) -> None:
+        self._graph = graph
 
     async def ask(self, message: str) -> str:
-        return await self._llm.generate(message)
+        result = await self._graph.ainvoke(
+            ChatState(
+                message=message,
+                answer="",
+            )
+        )
+
+        return result["answer"]

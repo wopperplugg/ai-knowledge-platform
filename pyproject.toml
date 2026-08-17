@@ -16,6 +16,7 @@ dependencies = [
     "uvicorn>=0.52.3",
     "langchain",
     "langchain-ollama",
+    "langgraph>=1.2.11",
 ]
 
 [dependency-groups]

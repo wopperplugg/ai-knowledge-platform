@@ -4,7 +4,9 @@ from typing import Annotated
 from fastapi import Depends
 from langchain_ollama import ChatOllama
 
-from src.chat.llm import OllamaLLMClient
+from src.chat.graph.builder import build_chat_graph
+from src.chat.graph.state import ChatGraph
+from src.chat.llm import LLMClient, OllamaLLMClient
 from src.chat.service import ChatService
 from src.core.config import get_settings
 
@@ -26,7 +28,14 @@ def get_llm_client(
     return OllamaLLMClient(model=model)
 
 
+@lru_cache
+def get_chat_graph(
+    llm: Annotated[LLMClient, Depends(get_llm_client)],
+) -> ChatGraph:
+    return build_chat_graph(llm)
+
+
 def get_chat_service(
-    llm: Annotated[OllamaLLMClient, Depends(get_llm_client)],
+    graph: Annotated[ChatGraph, Depends(get_chat_graph)],
 ) -> ChatService:
-    return ChatService(llm=llm)
+    return ChatService(graph=graph)
