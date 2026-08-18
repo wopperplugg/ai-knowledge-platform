@@ -13,4 +13,4 @@ def build_chat_graph(llm: LLMClient) -> ChatGraph:
     graph.add_edge(START, "generate")
     graph.add_edge("generate", END)
 
-    return cast(ChatGraph, graph.compile())
+    return graph.compile()

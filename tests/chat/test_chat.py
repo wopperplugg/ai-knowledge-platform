@@ -6,21 +6,20 @@ from fastapi import HTTPException
 from fastapi.routing import APIRoute
 from pydantic import ValidationError
 
-from src.chat.graph.builder import build_chat_graph
-from src.chat.llm import LLMClient
 from src.chat.router import create_chat_router
 from src.chat.schemas import ChatRequest, ChatResponse
 from src.chat.service import ChatService
+from src.chat.workflow import ChatWorkflow
 
 
-class SuccessfulLLMClient:
-    async def generate(self, message: str) -> str:
+class SuccessfulWorkflow:
+    async def run(self, message: str) -> str:
         return f"answer: {message}"
 
 
-class FailingLLMClient:
-    async def generate(self, message: str) -> str:
-        raise RuntimeError("LLM service is unavailable")
+class FailingWorkflow:
+    async def run(self, message: str) -> str:
+        raise RuntimeError("Chat workflow failed")
 
 
 def get_chat_endpoint() -> Callable[[ChatRequest, ChatService], Awaitable[ChatResponse]]:
@@ -31,8 +30,7 @@ def get_chat_endpoint() -> Callable[[ChatRequest, ChatService], Awaitable[ChatRe
 
 async def test_chat_returns_answer() -> None:
     endpoint = get_chat_endpoint()
-    graph = build_chat_graph(cast(LLMClient, SuccessfulLLMClient()))
-    service = ChatService(graph=graph)
+    service = ChatService(workflow=SuccessfulWorkflow())
 
     response = await endpoint(ChatRequest(message="hello"), service)
 
@@ -46,8 +44,7 @@ def test_chat_request_rejects_blank_message() -> None:
 
 async def test_chat_raises_502_when_llm_fails() -> None:
     endpoint = get_chat_endpoint()
-    graph = build_chat_graph(cast(LLMClient, FailingLLMClient()))
-    service = ChatService(graph=graph)
+    service = ChatService(workflow=cast(ChatWorkflow, FailingWorkflow()))
 
     with pytest.raises(HTTPException) as exc_info:
         await endpoint(ChatRequest(message="hello"), service)

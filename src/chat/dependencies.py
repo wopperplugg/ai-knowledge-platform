@@ -8,6 +8,7 @@ from src.chat.graph.builder import build_chat_graph
 from src.chat.graph.state import ChatGraph
 from src.chat.llm import LLMClient, OllamaLLMClient
 from src.chat.service import ChatService
+from src.chat.workflow import LangGraphChatWorkflow
 from src.core.config import get_settings
 
 
@@ -35,7 +36,13 @@ def get_chat_graph(
     return build_chat_graph(llm)
 
 
-def get_chat_service(
+def get_chat_workflow(
     graph: Annotated[ChatGraph, Depends(get_chat_graph)],
+) -> LangGraphChatWorkflow:
+    return LangGraphChatWorkflow(graph=graph)
+
+
+def get_chat_service(
+    workflow: Annotated[LangGraphChatWorkflow, Depends(get_chat_workflow)],
 ) -> ChatService:
-    return ChatService(graph=graph)
+    return ChatService(workflow=workflow)

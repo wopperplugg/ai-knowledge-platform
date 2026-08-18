@@ -1,16 +1,9 @@
-from src.chat.graph.state import ChatGraph, ChatState
+from src.chat.workflow import ChatWorkflow
 
 
 class ChatService:
-    def __init__(self, graph: ChatGraph) -> None:
-        self._graph = graph
+    def __init__(self, workflow: ChatWorkflow) -> None:
+        self._workflow = workflow
 
     async def ask(self, message: str) -> str:
-        result = await self._graph.ainvoke(
-            ChatState(
-                message=message,
-                answer="",
-            )
-        )
-
-        return result["answer"]
+        return await self._workflow.run(message)

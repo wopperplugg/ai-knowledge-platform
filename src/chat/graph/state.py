@@ -1,11 +1,12 @@
 from collections.abc import Awaitable
-from typing import Any, Protocol, TypedDict
+from typing import Protocol
+
+from langgraph.graph import MessagesState
 
 
-class ChatState(TypedDict):
-    message: str
-    answer: str
+class ChatState(MessagesState):
+    pass
 
 
 class ChatGraph(Protocol):
-    def ainvoke(self, input: ChatState, *args: Any, **kwargs: Any) -> Awaitable[ChatState]: ...
+    def ainvoke(self, input: ChatState) -> Awaitable[object]: ...
